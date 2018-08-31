@@ -15,6 +15,16 @@ class UsersController < ApplicationController
         }
     end
 
+    def get_bot
+        @user = User.find_by(bot_url_id: params[:bot_url_id])
+        if @user.bot_name != ""
+            render json: @user.bot_name
+        else
+            render json: {bot_name: "Anon-Bot"}
+        end
+        
+    end
+
     def create
         #POST /users
         #example: user={username: "lisa", bot_name: "lisabot", triggers: [{text:"hi", responses: ["hi!", "hey"]}]}

@@ -17,8 +17,11 @@ class UsersController < ApplicationController
 
     def get_bot
         @user = User.find_by(bot_url_id: params[:bot_url_id])
-        if @user.bot_name != ""
-            render json: @user.bot_name
+        if @user.nil? 
+            render json: {error: "No bot found in this address!"}
+        end
+        if @user.bot_name != nil && @user.bot_name != ""
+            render json: {bot_name: @user.bot_name}
         else
             render json: {bot_name: "Anon-Bot"}
         end
@@ -62,9 +65,9 @@ class UsersController < ApplicationController
         #iterate through params to create triggers AND their responses
         unless user_params[:triggers] == nil
             user_params[:triggers].each do |trigger|
-                new_trigger = Trigger.create(text: trigger[:text], user: @user)
+                new_trigger = Trigger.find_or_create_by(text: trigger[:text], user: @user)
                 trigger[:responses].each do |response|
-                    new_response = Response.create(text: response[:text], trigger: new_trigger)
+                    new_response = Response.find_or_create_by(text: response[:text], trigger: new_trigger)
                 end
             end
         end

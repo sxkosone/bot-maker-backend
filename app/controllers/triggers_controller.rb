@@ -25,7 +25,7 @@ class TriggersController < ApplicationController
     private
     def find_trigger_match(user_message, user)
         #byebug
-        answer = "I don't understand"
+        answer = {text: "I don't understand"}
         user.triggers.map do |trigger|
             if trigger.text == user_message
                 answer = trigger.responses[0]

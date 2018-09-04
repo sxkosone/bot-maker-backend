@@ -8,8 +8,13 @@ class AuthController < ApplicationController
       user = User.find_by(username: params[:username])
       if user && user.authenticate(params[:password])
         token = encode({user_id: user.id})
-        
-        render json: { token: token, success: true, current_user: user }
+        current_user = {
+          username: user.username,
+          bot_name: user.bot_name,
+          bot_url_id: user.bot_url_id,
+          id: user.id
+        }
+        render json: { token: token, success: true, current_user: current_user }
       else
         render json: { success: false }, status: 401
       end

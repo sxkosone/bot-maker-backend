@@ -28,7 +28,8 @@ class TriggersController < ApplicationController
         answer = {text: "I don't understand"}
         user.triggers.map do |trigger|
             if trigger.text == user_message
-                answer = trigger.responses[0]
+                random_index = rand(0..trigger.responses.length-1)
+                answer = trigger.responses[random_index]
             end
         end
         return answer

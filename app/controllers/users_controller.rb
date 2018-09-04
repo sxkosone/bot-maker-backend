@@ -16,14 +16,15 @@ class UsersController < ApplicationController
     end
 
     def get_bot
+        # GET /get-bot/:bot_url_id
         @user = User.find_by(bot_url_id: params[:bot_url_id])
         if @user.nil? 
             render json: {error: "No bot found in this address!"}
         end
         if @user.bot_name != nil && @user.bot_name != ""
-            render json: {bot_name: @user.bot_name}
+            render json: {bot_name: @user.bot_name, scripts: form_script(@user)}
         else
-            render json: {bot_name: "Anon-Bot"}
+            render json: {bot_name: "Anon-Bot", scripts: []}
         end
         
     end
@@ -84,5 +85,14 @@ class UsersController < ApplicationController
     private
     def user_params
         params.require(:user).permit(:username, :password, :bot_name, :bot_url_id, triggers: [:text, responses:[:text]])
+    end
+
+    def form_script(user)
+        return user.triggers.map do |trigger| 
+            {trigger: trigger.text, 
+            response: trigger.responses.map do |res| 
+                res.text end
+            } 
+        end
     end
 end

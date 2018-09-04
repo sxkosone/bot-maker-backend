@@ -65,10 +65,11 @@ class UsersController < ApplicationController
         @user.save
         #iterate through params to create triggers AND their responses
         unless user_params[:triggers] == nil
+            @user.triggers.destroy_all
             user_params[:triggers].each do |trigger|
-                new_trigger = Trigger.find_or_create_by(text: trigger[:text], user: @user)
+                new_trigger = Trigger.create(text: trigger[:text], user: @user)
                 trigger[:responses].each do |response|
-                    new_response = Response.find_or_create_by(text: response[:text], trigger: new_trigger)
+                    new_response = Response.create(text: response[:text], trigger: new_trigger)
                 end
             end
         end

@@ -1,14 +1,8 @@
-require 'fuzzystringmatch'
-#this may have to be changed to a bot class
-class User < ApplicationRecord
-    has_many :triggers
-    has_many :responses, through: :triggers
-    accepts_nested_attributes_for :triggers
-    #triggers accept nested attr for :responses
-    has_secure_password
-    validates :username, presence: true, uniqueness: true
+#####
+#NOT USED AT THE MOMENT!!
+#####
 
-    #these default scripts could be in a separate file
+class Matching
     @@GREETINGS = ["hi", "hey", "hello", "sup", "yo"]
     @@GOODBYES = ["bye", "byebye", "goodbye", "seeya"]
     @@EXISTENTIAL_Q = ["whatareyou", "whoareyou", "areyou", "howdoyouwork", "whatdoyoudo"]
@@ -19,14 +13,22 @@ class User < ApplicationRecord
     #native is faster (than pure) but cannot handle special chars
     @@fuzzy_match = FuzzyStringMatch::JaroWinkler.create(:native)
 
-    def respond_to_message(user_message, history, check_defaults=true)
-        msg = User.clean_word(user_message)
+    attr_accessor :history, :message, :user, :include_default_scripts
+
+    def initialize(message, history, user, include_default_scripts=true)
+        @message = Matching.clean_word(message)
+        @history = history
+        @user = user
+        @include_default_scripts = include_default_scripts
+    end
+
+    def respond_to_message
         answer = nil
         #first check if any user triggers match message
-        self.triggers.map do |trigger|
+        @user.triggers.map do |trigger|
             #implement fuzzy string matching
-            clean_trigger = User.clean_word(trigger.text)
-            if User.fuzzy_string_match(msg, clean_trigger)
+            clean_trigger = Matching.clean_word(trigger.text)
+            if Matching.fuzzy_string_match(msg, clean_trigger)
                 random_index = rand(0..trigger.responses.length - 1)
                 answer = trigger.responses[random_index].text
             end
@@ -41,24 +43,19 @@ class User < ApplicationRecord
             answer = "I'm sorry, I didn't understand that"
         end
 
-        if User.bad_understanding(history)
-            
-            random_index = rand(0..@@APOLOGIES_UNDERSTANDING.length - 1)
-            answer = @@APOLOGIES_UNDERSTANDING[random_index]
-        end
-
+        #bad understanding?
         return {text: answer}
     end
 
     def detect_any_default_messages(msg)
         #implement fancier fuzzy string match!
-        if User.fuzzy_string_match_array(msg, @@GREETINGS)
+        if Matching.fuzzy_string_match_array(msg, @@GREETINGS)
             random_i = rand(0..@@GREETINGS.length - 1)
             return @@GREETINGS[random_i]
-        elsif User.fuzzy_string_match_array(msg, @@GOODBYES)
+        elsif Matching.fuzzy_string_match_array(msg, @@GOODBYES)
             random_i = rand(0..@@GOODBYES.length - 1)
             return @@GOODBYES[random_i]
-        elsif User.fuzzy_string_match_array(msg, @@EXISTENTIAL_Q)
+        elsif Matching.fuzzy_string_match_array(msg, @@EXISTENTIAL_Q)
             random_i = rand(0..@@EXISTENTIAL_A.length - 1)
             return @@EXISTENTIAL_A[random_i]
         else
@@ -73,9 +70,8 @@ class User < ApplicationRecord
     end
 
     def self.bad_understanding(history)
-        
         #see if bot has said I dont understand in the last message
-        if history[-2]["text"] == "I'm sorry, I didn't understand that"
+        if history[history.length-2] == "I'm sorry, I didn't understand that"
             return true
         else
             return false
@@ -95,7 +91,7 @@ class User < ApplicationRecord
     def self.fuzzy_string_match_array(msg, array)
         #take an array of possible matches and look if message fuzzy matches any of them
         array.each do |string|
-            if User.fuzzy_string_match(msg, string)
+            if Matching.fuzzy_string_match(msg, string)
                 return true
             end
         end

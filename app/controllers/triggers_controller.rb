@@ -14,17 +14,15 @@ class TriggersController < ApplicationController
 
     def find_answer
         #POST '/find-answer'
-        user_message = params[:user_message]
+        message = params[:user_message]
         bot_url_id = params[:bot_url_id]
         @user = User.find_by(bot_url_id: bot_url_id)
         
-        if @user.include_default_scripts == false
+        #case1: user doesn't have default script detection on
         #only recognises exact trigger matches, else returns "I don't understand"
-            answer = find_exact_trigger_match(user_message, @user)
-        else
-            #recognises general greetings and greets back if no exact trigger matches. Fallback "I don't understand still there"
-            answer = @user.respond_to_message(user_message)
-        end
+        #case2: recognises general greetings and greets back if no exact trigger matches. Fallback "I don't understand" still there
+        answer = @user.respond_to_message(message, @user.include_default_scripts)
+        
         render json: answer
     end
 

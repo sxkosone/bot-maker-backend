@@ -15,23 +15,23 @@ class User < ApplicationRecord
     @@EXISTENTIAL_A = ["I am a friendly bot", "I am a chatbot"]
 
     #class has a native jaro winkler distance calculator instance for fuzzy string match
-    #native is faster but cannot handle special chars
+    #native is faster (than pure) but cannot handle special chars
     @@fuzzy_match = FuzzyStringMatch::JaroWinkler.create(:native)
 
-    def respond_to_message(user_message)
+    def respond_to_message(user_message, check_defaults)
         msg = User.clean_word(user_message)
         answer = nil
         #first check if any user triggers match message
         self.triggers.map do |trigger|
-            #implement some fancier fuzzy string matching
+            #implement fuzzy string matching
             clean_trigger = User.clean_word(trigger.text)
             if User.fuzzy_string_match(msg, clean_trigger)
                 random_index = rand(0..trigger.responses.length - 1)
                 answer = trigger.responses[random_index].text
             end
         end
-        if answer.nil?
-            #detect if the message was a greeting
+        if answer.nil? && check_defaults
+            #detect if the message was any of default messages
             answer = self.detect_any_default_messages(msg)
         end
         

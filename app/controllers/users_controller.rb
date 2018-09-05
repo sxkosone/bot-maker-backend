@@ -11,18 +11,24 @@ class UsersController < ApplicationController
             id: current_user.id,
             username: current_user.username, 
             bot_name: current_user.bot_name, 
-            bot_url_id: current_user.bot_url_id
+            bot_url_id: current_user.bot_url_id,
+            include_default_scripts: current_user.include_default_scripts
         }
     end
 
     def get_bot
+        #this is a public resource and should not be authenticated
         # GET /get-bot/:bot_url_id
         @user = User.find_by(bot_url_id: params[:bot_url_id])
         if @user.nil? 
             render json: {error: "No bot found in this address!"}
         end
         if @user.bot_name != nil && @user.bot_name != ""
-            render json: {bot_name: @user.bot_name, scripts: form_script(@user)}
+            render json: {
+                bot_name: @user.bot_name, 
+                scripts: form_script(@user), 
+                include_default_scripts: @user.include_default_scripts
+            }
         else
             render json: {bot_name: "Anon-Bot", scripts: []}
         end
@@ -30,6 +36,7 @@ class UsersController < ApplicationController
     end
 
     def create
+        #creating a new user shouldn't be authenticated
         #POST /users
         #example: user={username: "lisa", bot_name: "lisabot", triggers: [{text:"hi", responses: ["hi!", "hey"]}]}
         
@@ -47,13 +54,14 @@ class UsersController < ApplicationController
         if @user.valid?
             @user.save
             puts "created user #{@user}"
-            render json: @user
+            render json: {success: true, user: @user}
         else
             render json: {success: false, errors: @user.errors.messages}
         end 
     end
 
     def update
+        #this is authenticated before hitting this route
         #user adds new scripts
         @user = User.find_by(username: user_params[:username])
         unless user_params[:bot_name].nil? 
@@ -62,6 +70,8 @@ class UsersController < ApplicationController
         unless user_params[:bot_url_id].nil?
             @user.bot_url_id = user_params[:bot_url_id]
         end
+        #double check if this working, shoudl be!!!
+        @user.include_default_scripts = user_params[:include_default_scripts]
         @user.save
         #iterate through params to create triggers AND their responses
         unless user_params[:triggers] == nil
@@ -78,6 +88,7 @@ class UsersController < ApplicationController
     end
 
     def show
+        #this route will be deleted? no need after development?
         @user = User.find(params[:id])
         render json: @user
 
@@ -85,7 +96,7 @@ class UsersController < ApplicationController
 
     private
     def user_params
-        params.require(:user).permit(:username, :password, :bot_name, :bot_url_id, triggers: [:text, responses:[:text]])
+        params.require(:user).permit(:username, :password, :bot_name, :bot_url_id, :include_default_scripts, triggers: [:text, responses:[:text]])
     end
 
     def form_script(user)

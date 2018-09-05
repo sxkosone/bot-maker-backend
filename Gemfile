@@ -49,4 +49,4 @@ gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 gem 'active_model_serializers'
 
 #fuzzy string matching for comparing user messages to triggers
-#gem 'fuzzy-string-match
+gem 'fuzzy-string-match'

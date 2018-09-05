@@ -18,16 +18,18 @@ class TriggersController < ApplicationController
         bot_url_id = params[:bot_url_id]
         @user = User.find_by(bot_url_id: bot_url_id)
         
+        if @user.include_default_scripts == false
         #only recognises exact trigger matches, else returns "I don't understand"
-        #answer = find_trigger_match(user_message, @user)
-        
-        #recognises general greetings and greets back if no exact trigger matches. Fallback "I don't understand still there"
-        answer = @user.respond_to_message(user_message)
+            answer = find_exact_trigger_match(user_message, @user)
+        else
+            #recognises general greetings and greets back if no exact trigger matches. Fallback "I don't understand still there"
+            answer = @user.respond_to_message(user_message)
+        end
         render json: answer
     end
 
     private
-    def find_trigger_match(user_message, user)
+    def find_exact_trigger_match(user_message, user)
         answer = {text: "I don't understand"}
         user.triggers.map do |trigger|
             if trigger.text == user_message

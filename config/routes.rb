@@ -2,9 +2,9 @@ Rails.application.routes.draw do
   resources :users, only: [:create, :show, :index, :update] do #take out index after development!
     #nested routes: users have triggers, triggers have responses
     resources :triggers, shallow: true do #may not need all routes for triggers!
-      resources :responses, only: [:index, :show] #will I need more routes for responses?
     end
   end
+  resources :bots, only: [:destroy]
   #logging in
   post '/login', to: "auth#login"
   get '/user', to: "users#get_user"

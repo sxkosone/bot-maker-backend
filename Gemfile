@@ -50,3 +50,7 @@ gem 'active_model_serializers'
 
 #fuzzy string matching for comparing user messages to triggers
 gem 'fuzzy-string-match'
+
+#machine learning for mood detection
+gem "classifier-reborn"
+gem "fast-stemmer"

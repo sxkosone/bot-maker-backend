@@ -1,4 +1,5 @@
 require 'fuzzystringmatch'
+require 'classifier-reborn'
 #this may have to be changed to a bot class
 class User < ApplicationRecord
     has_many :triggers
@@ -9,14 +10,19 @@ class User < ApplicationRecord
     validates :username, presence: true, uniqueness: true
 
     #these default scripts could be in a separate file
+
     @@GREETINGS = ["hi", "hey", "hello", "sup", "yo"]
     @@GOODBYES = ["bye", "byebye", "goodbye", "seeya"]
-    @@EXISTENTIAL_Q = ["whatareyou", "whoareyou", "areyou", "howdoyouwork", "whatdoyoudo"]
+    @@EASY_QUESTIONS = ["howareyou", "howsitgoing", "howareyoutoday", "whatsup", "wussup"]
+    @@EXISTENTIAL_Q = ["whatareyou", "areyou", "doyouwork", "whatdoyoudo", "youreal"]
+
     @@EXISTENTIAL_A = ["I am a friendly bot", "I am a chatbot", "I'm a chatbot, the kind humans can program on this website"]
     @@APOLOGIES_UNDERSTANDING = ["I can see I'm not understanding you very well", "There seems to be some misunderstanding here", "I know this is getting old, but I'm still not understanding", "I still don't understand you", "That's not something I know how to answer to"]
-
+    @@EASY_ANSWERS = ["I'm okay, thanks for asking!", "Well, I don't have feelings because I am a bot", "It's going okay, how about you?"]
+    
     #class has a native jaro winkler distance calculator instance for fuzzy string match
     #native is faster (than pure) but cannot handle special chars
+    #should I save and retrieve this from the database or nah?
     @@fuzzy_match = FuzzyStringMatch::JaroWinkler.create(:native)
 
     def respond_to_message(user_message, history, check_defaults=true)
@@ -61,6 +67,9 @@ class User < ApplicationRecord
         elsif User.fuzzy_string_match_array(msg, @@EXISTENTIAL_Q)
             random_i = rand(0..@@EXISTENTIAL_A.length - 1)
             return @@EXISTENTIAL_A[random_i]
+        elsif User.fuzzy_string_match_array(msg, @@EASY_QUESTIONS)
+            random_i = rand(0..@@EASY_ANSWERS.length - 1)
+            return @@EASY_ANSWERS[random_i]
         else
             return nil
         end
@@ -70,20 +79,23 @@ class User < ApplicationRecord
         #take in latest sent message and array of all messages
         #example: "message_history"=>[{"sender"=>"human", "text"=>"hi"}, {"sender"=>"bot", "text"=>"o hai"}]
         #see if user has been saying the same thing before, if yes, how many times?
+
     end
 
     def self.bad_understanding(history)
-        
-        #see if bot has said I dont understand in the last message
-        if history[-2]["text"] == "I'm sorry, I didn't understand that"
-            return true
-        else
-            return false
+        if history.length > 4
+            #see if bot has said I dont understand in the last message
+            if history[-2]["text"] == "I'm sorry, I didn't understand that"
+                return true
+            else
+                return false
+            end
         end
+        return false
     end
 
     def self.fuzzy_string_match(msg, compare_msg)
-        #uses the Jaro-Winkler distance to represent "distance" between two words
+        #uses the Jaro-Winkler distance algorithm to represent "distance" between two words
         #strings that have over 0.8 score would be considered a "fuzzy match"
         if @@fuzzy_match.getDistance(msg, compare_msg) >= 0.8
             return true

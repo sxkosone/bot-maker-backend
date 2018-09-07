@@ -58,9 +58,12 @@ GEM
     byebug (10.0.2)
     case_transform (0.2)
       activesupport
+    classifier-reborn (2.2.0)
+      fast-stemmer (~> 1.0)
     concurrent-ruby (1.0.5)
     crass (1.0.4)
     erubi (1.7.1)
+    fast-stemmer (1.0.2)
     ffi (1.9.25)
     fuzzy-string-match (1.0.1)
       RubyInline (>= 3.8.6)
@@ -153,6 +156,8 @@ DEPENDENCIES
   bcrypt (~> 3.1.7)
   bootsnap (>= 1.1.0)
   byebug
+  classifier-reborn
+  fast-stemmer
   fuzzy-string-match
   jwt
   listen (>= 3.0.5, < 3.2)

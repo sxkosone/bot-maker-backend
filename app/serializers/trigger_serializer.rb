@@ -1,5 +1,5 @@
 class TriggerSerializer < ActiveModel::Serializer
   has_many :responses
-  belongs_to :user
-  attributes :id, :text, :user_id
+  belongs_to :bot
+  attributes :id, :text, :bot_id
 end

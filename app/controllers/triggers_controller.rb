@@ -1,20 +1,21 @@
 class TriggersController < ApplicationController
-    def index
-        #get all that users triggers
-        #route GET /users/:user_id/triggers
-        @triggers = Trigger.where(user_id: params[:user_id])
-        render json: @triggers
-    end
+    #these first two routes not really used so commenting them out to see if they can be deleted
+    # def index
+    #     #get all that users triggers
+    #     #route GET /users/:user_id/triggers
+    #     @triggers = Trigger.where(user_id: params[:user_id])
+    #     render json: @triggers
+    # end
 
-    def show
-        #route GET /triggers/:id
-        @trigger = Trigger.find(params[:id])
-        render json: @trigger
-    end
+    # def show
+    #     #route GET /triggers/:id
+    #     @trigger = Trigger.find(params[:id])
+    #     render json: @trigger
+    # end
 
     def find_answer
         #POST '/find-answer'
-        
+        #TODO change this to use Bot model to retrieve responses
         bot_url_id = params[:bot_url_id]
         @user = User.find_by(bot_url_id: bot_url_id)
         
@@ -24,18 +25,6 @@ class TriggersController < ApplicationController
         answer = @user.respond_to_message(params[:user_message], params[:message_history], @user.include_default_scripts)
         
         render json: answer
-    end
-
-    private
-    def find_exact_trigger_match(user_message, user)
-        answer = {text: "I don't understand"}
-        user.triggers.map do |trigger|
-            if trigger.text == user_message
-                random_index = rand(0..trigger.responses.length-1)
-                answer = {text: trigger.responses[random_index].text}
-            end
-        end
-        return answer
     end
 
 end

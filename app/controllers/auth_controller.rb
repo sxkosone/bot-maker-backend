@@ -9,6 +9,7 @@ class AuthController < ApplicationController
       if user && user.authenticate(params[:password])
         token = encode({user_id: user.id})
         current_user = {
+          #TODO render an array of bots and their url ids!
           username: user.username,
           bot_name: user.bot_name,
           bot_url_id: user.bot_url_id,

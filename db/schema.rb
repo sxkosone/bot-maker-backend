@@ -10,13 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_05_202957) do
+ActiveRecord::Schema.define(version: 2018_09_07_140721) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
+  create_table "bots", force: :cascade do |t|
+    t.string "name"
+    t.string "url_id"
+    t.integer "user_id"
+    t.boolean "include_default_scripts"
+    t.string "description"
+  end
+
   create_table "classifiers", force: :cascade do |t|
-    t.text "classifier"
     t.binary "saved"
   end
 
@@ -28,7 +35,7 @@ ActiveRecord::Schema.define(version: 2018_09_05_202957) do
   end
 
   create_table "triggers", force: :cascade do |t|
-    t.integer "user_id"
+    t.integer "bot_id"
     t.string "text"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -37,11 +44,8 @@ ActiveRecord::Schema.define(version: 2018_09_05_202957) do
   create_table "users", force: :cascade do |t|
     t.string "username"
     t.string "password_digest", null: false
-    t.string "bot_name"
-    t.string "bot_url_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "include_default_scripts"
   end
 
 end

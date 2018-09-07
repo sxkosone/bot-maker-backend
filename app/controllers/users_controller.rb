@@ -7,16 +7,16 @@ class UsersController < ApplicationController
     end
 
     def get_user
+        #TODO change this to render an array of botnames and bot url ids
         render json: { 
             id: current_user.id,
             username: current_user.username, 
-            bot_name: current_user.bot_name, 
-            bot_url_id: current_user.bot_url_id,
-            include_default_scripts: current_user.include_default_scripts
+            bots: current_user.bots
         }
     end
 
     def get_bot
+        #WAS BE MOVED to BOTcontroller
         #this is a public resource and should not be authenticated
         # GET /get-bot/:bot_url_id
         @user = User.find_by(bot_url_id: params[:bot_url_id])
@@ -36,6 +36,7 @@ class UsersController < ApplicationController
     end
 
     def create
+        #TODO MODIFY TO CREATE A NEW BOT AT THE SAME TIME
         #creating a new user shouldn't be authenticated
         #POST /users
         #example: user={username: "lisa", bot_name: "lisabot", triggers: [{text:"hi", responses: ["hi!", "hey"]}]}
@@ -61,6 +62,7 @@ class UsersController < ApplicationController
     end
 
     def update
+        #TODO update bots scripts too!
         #this is authenticated before hitting this route
         #user adds new scripts
         @user = User.find_by(username: user_params[:username])
@@ -99,12 +101,12 @@ class UsersController < ApplicationController
         params.require(:user).permit(:username, :password, :bot_name, :bot_url_id, :include_default_scripts, triggers: [:text, responses:[:text]])
     end
 
-    def form_script(user)
-        return user.triggers.map do |trigger| 
-            {trigger: trigger.text, 
-            response: trigger.responses.map do |res| 
-                res.text end
-            } 
-        end
-    end
+    # def form_script(user)
+    #     return user.triggers.map do |trigger| 
+    #         {trigger: trigger.text, 
+    #         response: trigger.responses.map do |res| 
+    #             res.text end
+    #         } 
+    #     end
+    # end
 end

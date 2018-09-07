@@ -11,8 +11,7 @@ class AuthController < ApplicationController
         current_user = {
           #TODO render an array of bots and their url ids!
           username: user.username,
-          bot_name: user.bot_name,
-          bot_url_id: user.bot_url_id,
+          bots: user.bots,
           id: user.id
         }
         render json: { token: token, success: true, current_user: current_user }

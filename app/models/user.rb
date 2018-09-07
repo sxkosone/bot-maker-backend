@@ -9,6 +9,7 @@ class User < ApplicationRecord
     #triggers accept nested attr for :responses
     has_many :bots
     accepts_nested_attributes_for :bots
+    #accepts_nested_attributes_for :triggers
     has_secure_password
     validates :username, presence: true, uniqueness: true
 

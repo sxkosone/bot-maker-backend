@@ -1,5 +1,6 @@
 class BotsController < ApplicationController
     def show
+        #GET /bots/:url_id
         #used to be GET /get-bot/:bot_url_id
         #this is a public resource and should not be authenticated
         

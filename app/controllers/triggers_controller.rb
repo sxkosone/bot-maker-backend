@@ -15,7 +15,6 @@ class TriggersController < ApplicationController
 
     def find_answer
         #POST '/find-answer'
-        #TODO change this to use Bot model to retrieve responses
         bot_url_id = params[:bot_url_id]
         @bot = Bot.find_by(url_id: bot_url_id)
         

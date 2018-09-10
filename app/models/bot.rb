@@ -40,18 +40,22 @@ class Bot < ApplicationRecord
             #detect if the message was any of default messages
             answer = self.detect_any_default_messages(msg)
         end
+
+        if answer.nil?
+            answer = self.detect_mood(user_message)
+        end
         
         if answer.nil?
             #fallback 
             answer = "I'm sorry, I didn't understand that"
-        end
 
-        if Bot.bad_understanding(history)
+            if Bot.bad_understanding(history)
             
-            random_index = rand(0..@@APOLOGIES_UNDERSTANDING.length - 1)
-            answer = @@APOLOGIES_UNDERSTANDING[random_index]
+                random_index = rand(0..@@APOLOGIES_UNDERSTANDING.length - 1)
+                answer = @@APOLOGIES_UNDERSTANDING[random_index]
+            end
         end
-
+        
         return {text: answer}
     end
 
@@ -79,6 +83,23 @@ class Bot < ApplicationRecord
         #example: "message_history"=>[{"sender"=>"human", "text"=>"hi"}, {"sender"=>"bot", "text"=>"o hai"}]
         #see if user has been saying the same thing before, if yes, how many times?
 
+    end
+
+    def detect_mood(msg)
+        c = Classifier.find(1).saved
+        classifier = Marshal.load(c)
+        result = classifier.classify_with_score(msg)
+        #byebug
+        if result[1] > -10
+            if result[0] == "Good"
+                return "That sounds like a good thing!"
+            else
+                return "That doesn't sound good..."
+            end
+        else
+            return nil
+        end
+        
     end
 
     def self.bad_understanding(history)

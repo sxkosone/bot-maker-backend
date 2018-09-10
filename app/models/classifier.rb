@@ -1,6 +1,7 @@
 #this is a training class for machine learning classifier
 
 class Classifier < ApplicationRecord
+    belongs_to :bot
     def train_moods
         goods = 
         "good

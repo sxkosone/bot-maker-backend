@@ -6,6 +6,8 @@ class Bot < ApplicationRecord
     #this used to be in user
     has_many :triggers
     has_many :responses, through: :triggers
+    has_one :classifier
+    has_many :classifier_responses
     accepts_nested_attributes_for :triggers
 
     #these default scripts could be in a separate file

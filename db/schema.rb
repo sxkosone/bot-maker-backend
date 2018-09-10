@@ -21,7 +21,7 @@ ActiveRecord::Schema.define(version: 2018_09_10_204203) do
     t.integer "user_id"
     t.boolean "include_default_scripts"
     t.string "description"
-    t.boolean "classifier"
+    t.boolean "include_classifier"
   end
 
   create_table "classifier_responses", force: :cascade do |t|

@@ -44,7 +44,7 @@ class Bot < ApplicationRecord
         end
 
         if answer.nil?
-            answer = self.detect_mood(user_message)
+            answer = self.classify(user_message)
         end
         
         if answer.nil?
@@ -80,24 +80,19 @@ class Bot < ApplicationRecord
         end
     end
 
-    def detect_message_repetition(msg, history)
-        #take in latest sent message and array of all messages
-        #example: "message_history"=>[{"sender"=>"human", "text"=>"hi"}, {"sender"=>"bot", "text"=>"o hai"}]
-        #see if user has been saying the same thing before, if yes, how many times?
-
-    end
-
-    def detect_mood(msg)
-        c = Classifier.find(1).saved
+    def classify(msg)
+        c = Classifier.find_by(bot_id: self.id).saved
         classifier = Marshal.load(c)
         result = classifier.classify_with_score(msg)
         #byebug
         if result[1] > -10
-            if result[0] == "Good"
-                return "That sounds like a good thing!"
+            category = ""
+            if result[0] == "Category 1"
+                category = self.classifier.category_1
             else
-                return "That doesn't sound good..."
+                category = self.classifier.category_2
             end
+            return self.classifier_responses.where(category: category)[0].text
         else
             return nil
         end
@@ -142,7 +137,38 @@ class Bot < ApplicationRecord
 
     def training(data)
         #example data:{"category1"=>"a", "category2"=>"b", "data1"=>"aa", "data2"=>"bb", "responses"=><ActionController::Parameters{"responses1"=>["aha", "oho"], "responses2"=>["b/bye"]}
-        byebug
+        
+        #find if this bot has a classifier already
+        #if have a classifier, delete that one and all the classifier_responses
+        if self.classifier
+            self.classifier.destroy
+            
+        end
+        #create a new classifier with those two categories
+        classifier = ClassifierReborn::Bayes.new('Category 1', 'Category 2')
+        #train your classifier with the training data
+        classifier.train_category_1(data[:data1])
+        classifier.train_category_2(data[:data2])
+        puts classifier
+        #save the classifier back to the database with the categories, data and bot_id
+        
+        Classifier.create(
+            bot: self, 
+            saved: Marshal.dump(classifier), 
+            category_1: data[:category1], 
+            category_2: data[:category2], 
+            data_1: data[:data1], 
+            data_2: data[:data2]
+            )
+        #save your responses to classifier_responses table with the bot_id
+        data[:responses][:responses1].each do |response|
+            ClassifierResponse.find_or_create_by(bot: self, category: data[:category1], text: response)
+        end
+        data[:responses][:responses2].each do |response|
+            ClassifierResponse.find_or_create_by(bot: self, category: data[:category2], text: response)
+        end
+
+        
     end
 
 end

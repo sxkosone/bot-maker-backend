@@ -49,6 +49,7 @@ class UsersController < ApplicationController
         
         #double check if this working, shoudl be!!!
         @bot.include_default_scripts = user_params[:include_default_scripts]
+        @bot.include_classifier = user_params[:include_classifier]
         @bot.save
         #iterate through params to create triggers AND their responses
         unless user_params[:triggers] == nil
@@ -73,7 +74,7 @@ class UsersController < ApplicationController
 
     private
     def user_params
-        params.require(:user).permit(:username, :password, :bot_name, :bot_url_id, :bot_description, :include_default_scripts, triggers: [:text, responses:[:text]])
+        params.require(:user).permit(:username, :password, :bot_name, :bot_url_id, :bot_description, :include_default_scripts, :include_classifier, triggers: [:text, responses:[:text]])
     end
 
 end

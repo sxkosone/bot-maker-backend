@@ -1,5 +1,5 @@
 class BotsController < ApplicationController
-    before_action :authenticate, only: [:destroy]    
+    before_action :authenticate, only: [:destroy, :training]    
     
     def show
         #GET /bots/:url_id
@@ -24,6 +24,8 @@ class BotsController < ApplicationController
         end
     end
 
+    
+
     def destroy
         @bot = Bot.find(params[:id])
         user = User.find(@bot.user.id)
@@ -36,6 +38,19 @@ class BotsController < ApplicationController
         end
     end
 
+    def training
+        #POST /training/:bot_url_id
+        @bot = Bot.find_by(url_id: params[:bot_url_id])
+        if @bot.nil?
+            
+            render json: {success: false, message: "Something went wrong, could not locate bot"}
+        else
+            @bot.training(training_params)
+            byebug
+            render json: {success: true, message: "Finished training your bot"}
+        end
+    end
+
     private
     def form_script(bot)
         return bot.triggers.map do |trigger| 
@@ -44,5 +59,9 @@ class BotsController < ApplicationController
                 res.text end
             } 
         end
+    end
+
+    def training_params
+        params.require(:bot).permit(:category1, :category2, :data1, :data2, :bot_url_id, responses:{})
     end
 end

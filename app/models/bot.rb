@@ -138,4 +138,9 @@ class Bot < ApplicationRecord
         return string.downcase.gsub(/[^0-9a-z]/i, '')
     end
 
+    def training(data)
+        #example data:{"category1"=>"a", "category2"=>"b", "data1"=>"aa", "data2"=>"bb", "responses"=><ActionController::Parameters{"responses1"=>["aha", "oho"], "responses2"=>["b/bye"]}
+        byebug
+    end
+
 end

@@ -13,10 +13,10 @@ class Bot < ApplicationRecord
     @@GREETINGS = ["hi", "hey", "hello", "sup", "yo"]
     @@GOODBYES = ["bye", "byebye", "goodbye", "seeya"]
     @@EASY_QUESTIONS = ["howareyou", "howsitgoing", "howareyoutoday", "whatsup", "wussup"]
-    @@EXISTENTIAL_Q = ["whatareyou", "areyou", "doyouwork", "whatdoyoudo", "youreal"]
+    @@EXISTENTIAL_Q = ["whatareyou", "doyouwork", "whatdoyoudo", "youreal"]
 
     @@EXISTENTIAL_A = ["I am a friendly bot", "I am a chatbot", "I'm a chatbot, the kind humans can program on this website"]
-    @@APOLOGIES_UNDERSTANDING = ["I can see I'm not understanding you very well", "There seems to be some misunderstanding here", "I know this is getting old, but I'm still not understanding", "I still don't understand you", "That's not something I know how to answer to"]
+    @@APOLOGIES_UNDERSTANDING = ["I can see I'm not understanding. Can you rephrase?", "There seems to be some misunderstanding here...", "I don't understand, can you rephrase?", "I still don't understand you. Can you say that again differently?", "That's not something I know how to answer to"]
     @@EASY_ANSWERS = ["I'm okay, thanks for asking!", "Well, I don't have feelings because I am a bot", "It's going okay, how about you?"]
     
     #class has a native jaro winkler distance calculator instance for fuzzy string match

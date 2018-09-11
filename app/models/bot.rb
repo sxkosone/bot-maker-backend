@@ -15,7 +15,7 @@ class Bot < ApplicationRecord
     @@GREETINGS = ["hi", "hey", "hello", "morning"]
     @@GOODBYES = ["bye", "byebye", "goodbye", "seeya"]
     @@EASY_QUESTIONS = ["howareyou", "howsitgoing", "howareyoutoday", "whatsup", "wussup"]
-    @@EXISTENTIAL_Q = ["whatareyou", "doyouwork", "whatdoyoudo", "youreal"]
+    @@EXISTENTIAL_Q = ["whatareyou", "whatdoyoudo", "areyoureal"]
 
     @@EXISTENTIAL_A = ["I am a friendly bot", "I am a chatbot", "I'm a chatbot, the kind humans can program on this website"]
     @@APOLOGIES_UNDERSTANDING = ["I can see I'm not understanding. Can you rephrase?", "There seems to be some misunderstanding here...", "I don't understand, can you rephrase?", "I still don't understand you. Can you say that again differently?", "That's not something I know how to answer to"]
@@ -29,6 +29,7 @@ class Bot < ApplicationRecord
     def respond_to_message(user_message, history, check_defaults=true)
         msg = Bot.clean_word(user_message)
         answer = nil
+
         #first check if any user triggers match message
         self.triggers.map do |trigger|
             #implement fuzzy string matching
@@ -38,27 +39,27 @@ class Bot < ApplicationRecord
                 answer = trigger.responses[random_index].text
             end
         end
+
+        #second, classify using machine learning instance
+        if answer.nil? && self.include_classifier
+            answer = self.classify(user_message)
+        end
+
+        #third, detect if the message was any of default messages
         if answer.nil? && check_defaults
-            #detect if the message was any of default messages
             answer = self.detect_any_default_messages(msg)
         end
 
-        if answer.nil? && self.include_classifier
-            
-            answer = self.classify(user_message)
-        end
-        
-        if answer.nil?
-            #fallback 
+        #fallback
+        if answer.nil? 
             answer = "I'm sorry, I didn't understand that"
-
+            #check if you've said I don't understand a lot
             if Bot.bad_understanding(history)
-            
                 random_index = rand(0..@@APOLOGIES_UNDERSTANDING.length - 1)
                 answer = @@APOLOGIES_UNDERSTANDING[random_index]
             end
         end
-        
+
         return {text: answer}
     end
 

@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   resources :users, only: [:create, :show, :index, :update] do #take out index after development!
     #nested routes: users have triggers, triggers have responses
-    resources :triggers, shallow: true do #may not need all routes for triggers!
+    #resources :triggers, shallow: true do #may not need all routes for triggers!
     end
   end
   resources :bots, only: [:destroy]

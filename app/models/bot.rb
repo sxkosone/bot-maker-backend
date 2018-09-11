@@ -12,7 +12,7 @@ class Bot < ApplicationRecord
 
     #these default scripts could be in a separate file
 
-    @@GREETINGS = ["hi", "hey", "hello", "sup", "yo"]
+    @@GREETINGS = ["hi", "hey", "hello", "morning"]
     @@GOODBYES = ["bye", "byebye", "goodbye", "seeya"]
     @@EASY_QUESTIONS = ["howareyou", "howsitgoing", "howareyoutoday", "whatsup", "wussup"]
     @@EXISTENTIAL_Q = ["whatareyou", "doyouwork", "whatdoyoudo", "youreal"]
@@ -43,7 +43,8 @@ class Bot < ApplicationRecord
             answer = self.detect_any_default_messages(msg)
         end
 
-        if answer.nil?
+        if answer.nil? && self.include_classifier
+            
             answer = self.classify(user_message)
         end
         
@@ -81,18 +82,22 @@ class Bot < ApplicationRecord
     end
 
     def classify(msg)
-        c = Classifier.find_by(bot_id: self.id).saved
-        classifier = Marshal.load(c)
+        c = Classifier.find_by(bot_id: self.id)
+        if c.nil?
+            return nil
+        end
+        classifier = Marshal.load(c.saved)
         result = classifier.classify_with_score(msg)
         #byebug
-        if result[1] > -10
+        if result[1] > -15
             category = ""
             if result[0] == "Category 1"
                 category = self.classifier.category_1
             else
                 category = self.classifier.category_2
             end
-            return self.classifier_responses.where(category: category)[0].text
+            random_i = self.classifier_responses.where(category: category).length
+            return self.classifier_responses.where(category: category)[random_i-1].text
         else
             return nil
         end
@@ -142,7 +147,6 @@ class Bot < ApplicationRecord
         #if have a classifier, delete that one and all the classifier_responses
         if self.classifier
             self.classifier.destroy
-            
         end
         #create a new classifier with those two categories
         classifier = ClassifierReborn::Bayes.new('Category 1', 'Category 2')
@@ -160,12 +164,14 @@ class Bot < ApplicationRecord
             data_1: data[:data1], 
             data_2: data[:data2]
             )
+        #delete old responses
+        ClassifierResponse.where(bot_id: self.id).destroy_all
         #save your responses to classifier_responses table with the bot_id
         data[:responses][:responses1].each do |response|
-            ClassifierResponse.find_or_create_by(bot: self, category: data[:category1], text: response)
+            ClassifierResponse.create(bot: self, category: data[:category1], text: response)
         end
         data[:responses][:responses2].each do |response|
-            ClassifierResponse.find_or_create_by(bot: self, category: data[:category2], text: response)
+            ClassifierResponse.create(bot: self, category: data[:category2], text: response)
         end
 
         

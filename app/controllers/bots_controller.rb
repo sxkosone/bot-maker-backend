@@ -48,7 +48,7 @@ class BotsController < ApplicationController
             @bot.training(training_params)
             @bot.include_classifier = true
             @bot.save
-            byebug
+            
             render json: {success: true, message: "Finished training your bot"}
         end
     end
@@ -60,6 +60,7 @@ class BotsController < ApplicationController
         if @bot.nil?
             render json: {success: false, message: "Something went wrong, could not locate bot"}
         else
+            
             render json: {success: true, classifier: @bot.classifier, classifier_responses: @bot.classifier_responses}
         end
     end

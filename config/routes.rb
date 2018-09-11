@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   get '/bots/:bot_url_id', to: "bots#show"
   post '/find-answer', to: "triggers#find_answer"
   post '/training/:bot_url_id', to: "bots#training"
+  get '/classifier/:bot_url_id', to: "bots#classifier"
   
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 end

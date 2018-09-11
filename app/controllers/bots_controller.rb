@@ -53,6 +53,17 @@ class BotsController < ApplicationController
         end
     end
 
+    def classifier
+        #GET /classifier/:bot_url_id
+        @bot = Bot.find_by(url_id: params[:bot_url_id])
+        #byebug
+        if @bot.nil?
+            render json: {success: false, message: "Something went wrong, could not locate bot"}
+        else
+            render json: {success: true, classifier: @bot.classifier, classifier_responses: @bot.classifier_responses}
+        end
+    end
+
     private
     def form_script(bot)
         return bot.triggers.map do |trigger| 

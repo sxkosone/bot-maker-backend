@@ -31,10 +31,10 @@ class BotsController < ApplicationController
         user = User.find(@bot.user.id)
         user_obj = {username: user.username, bots: user.bots}
         if @bot.nil? 
-            render json: {success: false, message: "could not delete this bot"}
+            render json: {success: false, message: "Could not delete this bot"}
         else 
             @bot.destroy
-            render json: {success: true, message: "bot deleted", user: user_obj}
+            render json: {success: true, message: "Successfully deleted bot", user: user_obj}
         end
     end
 

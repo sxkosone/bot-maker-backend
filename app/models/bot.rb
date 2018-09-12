@@ -35,8 +35,8 @@ class Bot < ApplicationRecord
             #implement fuzzy string matching
             clean_trigger = Bot.clean_word(trigger.text)
             if Bot.fuzzy_string_match(msg, clean_trigger)
-                random_index = rand(0..trigger.responses.length - 1)
-                answer = trigger.responses[random_index].text
+                #random_index = rand(0..trigger.responses.length - 1)
+                answer = trigger.responses.sample.text
             end
         end
 
@@ -55,8 +55,8 @@ class Bot < ApplicationRecord
             answer = "I'm sorry, I didn't understand that"
             #check if you've said I don't understand a lot
             if Bot.bad_understanding(history)
-                random_index = rand(0..@@APOLOGIES_UNDERSTANDING.length - 1)
-                answer = @@APOLOGIES_UNDERSTANDING[random_index]
+                #random_index = rand(0..@@APOLOGIES_UNDERSTANDING.length - 1)
+                answer = @@APOLOGIES_UNDERSTANDING.sample
             end
         end
 
@@ -66,17 +66,17 @@ class Bot < ApplicationRecord
     def detect_any_default_messages(msg)
         #implement fancier fuzzy string match!
         if Bot.fuzzy_string_match_array(msg, @@GREETINGS)
-            random_i = rand(0..@@GREETINGS.length - 1)
-            return @@GREETINGS[random_i]
+            #random_i = rand(0..@@GREETINGS.length - 1)
+            return @@GREETINGS.sample
         elsif Bot.fuzzy_string_match_array(msg, @@GOODBYES)
-            random_i = rand(0..@@GOODBYES.length - 1)
-            return @@GOODBYES[random_i]
+            #random_i = rand(0..@@GOODBYES.length - 1)
+            return @@GOODBYES.sample
         elsif Bot.fuzzy_string_match_array(msg, @@EXISTENTIAL_Q)
-            random_i = rand(0..@@EXISTENTIAL_A.length - 1)
-            return @@EXISTENTIAL_A[random_i]
+            #random_i = rand(0..@@EXISTENTIAL_A.length - 1)
+            return @@EXISTENTIAL_A.sample
         elsif Bot.fuzzy_string_match_array(msg, @@EASY_QUESTIONS)
-            random_i = rand(0..@@EASY_ANSWERS.length - 1)
-            return @@EASY_ANSWERS[random_i]
+            #random_i = rand(0..@@EASY_ANSWERS.length - 1)
+            return @@EASY_ANSWERS.sample
         else
             return nil
         end
@@ -97,8 +97,10 @@ class Bot < ApplicationRecord
             else
                 category = self.classifier.category_2
             end
-            random_i = self.classifier_responses.where(category: category).length
-            return self.classifier_responses.where(category: category)[random_i-1].text
+            
+            # length = self.classifier_responses.where(category: category).length
+            # random_i = rand(0..length - 1)
+            return self.classifier_responses.where(category: category).sample.text
         else
             return nil
         end

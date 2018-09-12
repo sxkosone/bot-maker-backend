@@ -6,9 +6,11 @@ class Bot < ApplicationRecord
     #this used to be in user
     has_many :triggers
     has_many :responses, through: :triggers
+    has_many :fallbacks
     has_one :classifier
     has_many :classifier_responses
     accepts_nested_attributes_for :triggers
+    accepts_nested_attributes_for :fallbacks
 
     #these default scripts could be in a separate file
 
@@ -53,8 +55,11 @@ class Bot < ApplicationRecord
         #fallback
         if answer.nil? 
             answer = "I'm sorry, I didn't understand that"
+            if self.fallbacks.any?
+                answer = self.fallbacks.sample.text
+                
+            elsif Bot.bad_understanding(history)
             #check if you've said I don't understand a lot
-            if Bot.bad_understanding(history)
                 #random_index = rand(0..@@APOLOGIES_UNDERSTANDING.length - 1)
                 answer = @@APOLOGIES_UNDERSTANDING.sample
             end

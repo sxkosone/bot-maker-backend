@@ -61,6 +61,15 @@ class UsersController < ApplicationController
                 end
             end
         end
+        #create fallbacks from non-strong params
+        
+        unless params[:user][:fallback] == nil
+            @bot.fallbacks.destroy_all
+            params[:user][:fallback].each do |f|
+                new_fallback = Fallback.create(text: f, bot: @bot)
+                
+            end
+        end
         
         render json: @user
     end

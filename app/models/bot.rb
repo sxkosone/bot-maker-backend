@@ -17,7 +17,7 @@ class Bot < ApplicationRecord
     @@GREETINGS = ["hi", "hey", "hello", "morning"]
     @@GOODBYES = ["bye", "byebye", "goodbye", "seeya"]
     @@EASY_QUESTIONS = ["howareyou", "howsitgoing", "howareyoutoday", "whatsup", "wussup"]
-    @@EXISTENTIAL_Q = ["whatareyou", "whatdoyoudo", "areyoureal"]
+    @@EXISTENTIAL_Q = ["whatareyou", "whatdoyoudo", "areyoureal", "whatisachatbot"]
 
     @@EXISTENTIAL_A = ["I am a friendly bot", "I am a chatbot", "I'm a chatbot, the kind humans can program on this website"]
     @@APOLOGIES_UNDERSTANDING = ["I can see I'm not understanding. Can you rephrase?", "There seems to be some misunderstanding here...", "I don't understand, can you rephrase?", "I still don't understand you. Can you say that again differently?", "That's not something I know how to answer to"]
@@ -42,15 +42,17 @@ class Bot < ApplicationRecord
             end
         end
 
+        #third, detect if the message was any of default messages
+        if answer.nil? && check_defaults
+            answer = self.detect_any_default_messages(msg)
+        end
+
         #second, classify using machine learning instance
         if answer.nil? && self.include_classifier
             answer = self.classify(user_message)
         end
 
-        #third, detect if the message was any of default messages
-        if answer.nil? && check_defaults
-            answer = self.detect_any_default_messages(msg)
-        end
+        
 
         #fallback
         if answer.nil? 
@@ -76,12 +78,12 @@ class Bot < ApplicationRecord
         elsif Bot.fuzzy_string_match_array(msg, @@GOODBYES)
             #random_i = rand(0..@@GOODBYES.length - 1)
             return @@GOODBYES.sample
-        elsif Bot.fuzzy_string_match_array(msg, @@EXISTENTIAL_Q)
-            #random_i = rand(0..@@EXISTENTIAL_A.length - 1)
-            return @@EXISTENTIAL_A.sample
         elsif Bot.fuzzy_string_match_array(msg, @@EASY_QUESTIONS)
             #random_i = rand(0..@@EASY_ANSWERS.length - 1)
             return @@EASY_ANSWERS.sample
+        elsif Bot.fuzzy_string_match_array(msg, @@EXISTENTIAL_Q)
+            #random_i = rand(0..@@EXISTENTIAL_A.length - 1)
+            return @@EXISTENTIAL_A.sample
         else
             return nil
         end

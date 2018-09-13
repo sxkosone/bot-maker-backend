@@ -95,7 +95,7 @@ class Bot < ApplicationRecord
         classifier = Marshal.load(c.saved)
         result = classifier.classify_with_score(msg)
         #byebug
-        if result[1] > -15
+        if result[1] > -10
             category = ""
             if result[0] == "Category 1"
                 category = self.classifier.category_1

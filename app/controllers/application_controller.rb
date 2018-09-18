@@ -20,7 +20,7 @@ class ApplicationController < ActionController::API
     end
 
     def secret_key
-        return "ei_kovin_salainen"
+        return ENV["secret_key"]
     end
 
     def encode(payload)

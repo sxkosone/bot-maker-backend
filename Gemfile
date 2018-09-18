@@ -54,3 +54,6 @@ gem 'fuzzy-string-match'
 #machine learning for mood detection
 gem "classifier-reborn"
 gem "fast-stemmer"
+
+#set environment variables, like secrets with figaro
+gem 'figaro'

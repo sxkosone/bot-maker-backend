@@ -7,13 +7,15 @@ class BotsController < ApplicationController
         #this is a public resource and should not be authenticated
         
         @bot = Bot.find_by(url_id: params[:bot_url_id])
-        bot_fallbacks = @bot.fallbacks.map do |fallback|
-            fallback.text
-        end
+        
         if @bot.nil?
-            
             render json: {success: false, error: "No bot found in this address!"}
         else
+            #collect bot fallback answers first, could be a helper method
+            bot_fallbacks = @bot.fallbacks.map do |fallback|
+                fallback.text
+            end
+
             if @bot.name != nil && @bot.name != ""
                 render json: {
                     success: true,
@@ -24,7 +26,7 @@ class BotsController < ApplicationController
                     fallback: bot_fallbacks
                 }
             else
-                render json: {success: true, bot_name: "Anon-Bot", scripts: []}
+                render json: {success: true, bot_name: "Anonymous-Bot", scripts: []}
             end
         end
     end
